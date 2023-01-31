@@ -1,0 +1,14 @@
+---
+title: "Pre-Class Assignment 01/31"
+output: html_document
+---
+
+## R Markdown
+
+I plan to plot my data in the form of line graphs for each of the four chosen cryptocurrencies. The x axis of these graphs will haves dates, while the y axis on the left will have the top 50% of trade volumes and the right will have the top 50% of market cap for the coin. I plan to make these graphs in the form of ggplots.
+
+
+
+
+
+
