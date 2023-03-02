@@ -1,43 +1,31 @@
 ---
-title: "Project Markdown"
+title: "Comparing Patterns in Blue Chip Cryptocurrencies and Meme Coin Cryptocurrencies"
+shorttitle: "Analyzing Transaction Data on Various Cryptocurrencies"
+
+author:
+  name: "Harsha Raman"
+  email: "harsharaman@uchicago.edu"
+  affiliation:
+    institution: "The University of Chicago"
+  
+
+abstract: "TBD"
+  
+  
 output: html_document
 ---
-
-# One Time Papaja Installation
-Below is the code used to install tinytex in order to install papaja.
-
-```{r}
-
-if(!requireNamespace("tinytex", quietly = TRUE)) install.packages("tinytex")
-tinytex::install_tinytex()
-
-```
-
-After installing tinytex, we are now able to install papaja as seen below. These two 
-chunks of code are only for one time use.
-
-```{r}
-# Install latest CRAN release
-install.packages("papaja")
-
-# Install remotes package if necessary
-if(!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
-
-# Install the stable development version from GitHub
-remotes::install_github("crsh/papaja")
-
-# Install the latest development snapshot from GitHub
-remotes::install_github("crsh/papaja@devel")
-
-```
 
 # Libraries
 The below two lines of code open the libraries that are necessary for the analysis of this data. 
 
 ```{r}
-library("tidyverse")
+library(tidyverse)
 library(gridExtra)
+library(knitr)
+
 ```
+[^1]: Here is a sample footnote. 
+
 
 # Bitcoin Data Refinement
 The following code checks if a refined version of the Bitcoin data exists in a CSV file. If it doesn't exist, the original Bitcoin data is read in and then refined by removing unnecessary columns, creating a new column called "Trading Days since ICO", dropping any rows with missing data, and renaming columns. The refined data is then written to a new CSV file called "Bitcoin_refined.csv". If the refined data already exists in the CSV file, it is simply read in from the file.
@@ -63,8 +51,16 @@ if (!file.exists("archive/Bitcoin_refined.csv")) {
   
 } else {
   # read in refined data from CSV
-  Bitcoin_refined <- read_csv("archive/Bitcoin_refined.csv")
+  Bitcoin_refined <- read_csv("archive/Bitcoin_refined.csv", show_col_types = FALSE)
 }
+
+```
+
+Below is a sample of the first 10 rows of the Bitcoin_refined.csv dataset that was to be used in the analysis:
+
+```{r}
+
+kable(head(Bitcoin_refined, 10))
 
 ```
 
@@ -100,14 +96,23 @@ if (!file.exists("archive/Ethereum_refined.csv")) {
            `Trading Volume` = 2, 
            `Market Cap` = 3, 
            `Trading Days since ICO` = 4)
+
   
   # write refined data to CSV
   write_csv(Ethereum_refined, "archive/Ethereum_refined.csv")
   
 } else {
   # read in refined data from CSV
-  Ethereum_refined <- read_csv("archive/Ethereum_refined.csv")
+  Ethereum_refined <- read_csv("archive/Ethereum_refined.csv", show_col_types = FALSE)
 }
+
+```
+
+Below is a sample of the first 10 rows of the Ethereum_refined.csv dataset that was to be used in the analysis:
+
+```{r}
+
+kable(head(Ethereum_refined, 10))
 
 ```
 
@@ -149,8 +154,16 @@ if (!file.exists("archive/Dogecoin_refined.csv")) {
   
 } else {
   # read in refined data from CSV
-  Dogecoin_refined <- read_csv("archive/Dogecoin_refined.csv")
+  Dogecoin_refined <- read_csv("archive/Dogecoin_refined.csv", show_col_types = FALSE)
 }
+
+```
+
+Below is a sample of the first 10 rows of the Dogecoin_refined.csv dataset that was to be used in the analysis:
+
+```{r}
+
+kable(head(Dogecoin_refined, 10))
 
 ```
 
@@ -192,8 +205,16 @@ if (!file.exists("archive/Shiba INU_refined.csv")) {
   
 } else {
   # read in refined data from CSV
-  `Shiba INU_refined` <- read_csv("archive/Shiba INU_refined.csv")
+  `Shiba INU_refined` <- read_csv("archive/Shiba INU_refined.csv",show_col_types = FALSE)
 }
+
+```
+
+Below is a sample of the first 10 rows of the Shiba INU_refined.csv dataset that was to be used in the analysis:
+
+```{r}
+
+kable(head(`Shiba INU_refined`, 10))
 
 ```
 
@@ -211,4 +232,3 @@ p2 <- ggplot(`Shiba INU_refined`, aes(`Trading Days since ICO`, `Market Cap`)) +
 grid.arrange(p1, p2, ncol = 2)
 
 ```
-
