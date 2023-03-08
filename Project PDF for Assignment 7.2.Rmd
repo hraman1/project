@@ -1,0 +1,359 @@
+---
+title: "Comparing Patterns in Blue Chip Cryptocurrencies and Meme Coin Cryptocurrencies"
+author:
+  name: Harsha Raman
+  email: harsharaman@uchicago.edu
+  affiliation:
+    institution: The University of Chicago
+shorttitle: Analyzing Transaction Data on Various Cryptocurrencies
+output:
+  pdf_document: default
+  html_document: default
+abstract: TBD
+---
+
+# Libraries
+The below lines of code open the libraries that are necessary for the analysis of this data. 
+
+```{r}
+library(tidyverse)
+library(gridExtra)
+library(knitr)
+library(tinylabels)
+library(papaja)
+library(apaTables)
+
+```
+[^1]: Here is a sample footnote. 
+
+
+# Bitcoin Data Refinement
+The following code checks if a refined version of the Bitcoin data exists in a CSV file. If it doesn't exist, the original Bitcoin data is read in and then refined by removing unnecessary columns, creating a new column called "Trading Days since ICO", dropping any rows with missing data, and renaming columns. The refined data is then written to a new CSV file called "Bitcoin_refined.csv". If the refined data already exists in the CSV file, it is simply read in from the file.
+
+```{r}
+
+if (!file.exists("archive/Bitcoin_refined.csv")) {
+  # read in original data
+  Bitcoin <- read.csv("archive/Bitcoin.csv")
+  
+  # refine data
+  Bitcoin_refined <- Bitcoin %>% 
+    select(-Open, -High, -Low, -Close) %>% 
+    mutate(`Trading Days since ICO` = row_number()) %>% 
+    drop_na() %>% 
+    rename(Date = 1, 
+           `Trading Volume` = 2, 
+           `Market Cap` = 3, 
+           `Trading Days since ICO` = 4)
+  
+  # write refined data to CSV
+  write_csv(Bitcoin_refined, "archive/Bitcoin_refined.csv")
+  
+} else {
+  # read in refined data from CSV
+  Bitcoin_refined <- read_csv("archive/Bitcoin_refined.csv", show_col_types = FALSE)
+}
+
+```
+
+Below is a sample of the first 10 rows of the Bitcoin_refined.csv dataset that was to be used in the analysis:
+
+```{r}
+
+kable(head(Bitcoin_refined, 10))
+
+```
+
+# Bitcoin Graphs
+The following code creates two graphs using the refined Bitcoin data: one displaying the Bitcoin trading volume by day and the other displaying the Bitcoin market cap by day. The grid.arrange() function arranges the two graphs side by side.
+```{r}
+
+#Bitcoin Graphs:
+p1 <- ggplot(Bitcoin_refined, aes(`Trading Days since ICO`, `Trading Volume`)) + 
+  geom_path() + ggtitle("Bitcoin Trading Volume by Day") +
+  labs(caption = "Figure 1: Movement of Bitcoin Trading Volume since ICO")
+
+p2 <- ggplot(Bitcoin_refined, aes(`Trading Days since ICO`, `Market Cap`)) + 
+  geom_path() + ggtitle("Bitcoin Market Cap by Day") +
+  labs(caption = "Figure 2: Movement of Bitcoin Market Capitalization since ICO")
+
+grid.arrange(p1, p2, ncol = 2)
+
+```
+
+Above we see Figures 1 and 2, depicting the movement of trade volume and market capitalization of Bitcoin since ICO. Though we see similar patterns in the trends, we don't necessarily see the two exactly matching one another. To further investigate the movement of these numbers, I chose to see what the derivative graphs for the Bitcoin's Trading Volume and Market Capitalization would look like.
+```{r}
+
+# Calculation of the first derivative of Trading Volume
+Bitcoin_refined <- Bitcoin_refined %>% 
+  mutate(dV = c(NA, diff(`Trading Volume`)) / diff(`Trading Days since ICO`))
+
+# Calculation of the first derivative of Market Cap
+Bitcoin_refined <- Bitcoin_refined %>% 
+  mutate(dMC = c(NA, diff(`Market Cap`)) / diff(`Trading Days since ICO`))
+
+# Bitcoin Derivative Graphs
+p3 <- ggplot(Bitcoin_refined, aes(`Trading Days since ICO`, dV)) +
+  geom_path() +
+  ggtitle("Derivative of Bitcoin Trading Volume by Day") +
+  ylab("")
+  labs(caption = "Figure 3: Movement of First Derivative of Bitcoin Trading Volume since ICO")
+
+p4 <- ggplot(Bitcoin_refined, aes(`Trading Days since ICO`, dMC)) +
+  geom_path() +
+  ggtitle("Derivative of Bitcoin Market Cap by Day") +
+  ylab("")
+  labs(caption = "Figure 4: Movement of First Derivative of Bitcoin Market Capitalization since ICO")
+
+# Arrange the two plots in a grid
+grid.arrange(p3, p4, ncol = 2)
+
+```
+
+# Ethereum Data Refinement
+The following code checks if a refined version of the Ethereum data exists in a CSV file. If it doesn't exist, the original Ethereum data is read in and then refined by removing unnecessary columns, creating a new column called "Trading Days since ICO", dropping any rows with missing data, and renaming columns. The refined data is then written to a new CSV file called "Ethereum_refined.csv". If the refined data already exists in the CSV file, it is simply read in from the file.
+```{r}
+
+if (!file.exists("archive/Ethereum_refined.csv")) {
+  # read in original data
+  Ethereum <- read.csv("archive/Ethereum.csv")
+  
+  # refine data
+  Ethereum_refined <- Ethereum %>% 
+    select(-Open, -High, -Low, -Close) %>% 
+    mutate(`Trading Days since ICO` = row_number()) %>% 
+    drop_na() %>% 
+    rename(Date = 1, 
+           `Trading Volume` = 2, 
+           `Market Cap` = 3, 
+           `Trading Days since ICO` = 4)
+
+  
+  # write refined data to CSV
+  write_csv(Ethereum_refined, "archive/Ethereum_refined.csv")
+  
+} else {
+  # read in refined data from CSV
+  Ethereum_refined <- read_csv("archive/Ethereum_refined.csv", show_col_types = FALSE)
+}
+
+```
+
+Below is a sample of the first 10 rows of the Ethereum_refined.csv dataset that was to be used in the analysis:
+
+```{r}
+
+kable(head(Ethereum_refined, 10))
+
+```
+
+# Ethereum Graphs
+The following code creates two graphs using the refined Ethereum data: one displaying the Ethereum trading volume by day and the other displaying the Ethereum market cap by day. The grid.arrange() function arranges the two graphs side by side.
+```{r}
+
+#Ethereum Graphs:
+p1 <- ggplot(Ethereum_refined, aes(`Trading Days since ICO`, `Trading Volume`)) + 
+  geom_path() + ggtitle("Ethereum Trading Volume by Day") +
+  labs(caption = "Figure 5: Movement of Ethereum Trading Volume since ICO")
+
+p2 <- ggplot(Ethereum_refined, aes(`Trading Days since ICO`, `Market Cap`)) + 
+  geom_path() + ggtitle("Ethereum Market Cap by Day") +
+  labs(caption = "Figure 6: Movement of Ethereum Market Capitalization since ICO")
+
+grid.arrange(p1, p2, ncol = 2)
+
+```
+
+Above we see Figures 1 and 2, depicting the movement of trade volume and market capitalization of Ethereum since ICO. Though we see similar patterns in the trends, we don't necessarily see the two exactly matching one another. To further investigate the movement of these numbers, I chose to see what the derivative graphs for the Ethereum's Trading Volume and Market Capitalization would look like.
+```{r}
+
+# Calculation of the first derivative of Trading Volume
+Ethereum_refined <- Ethereum_refined %>% 
+  mutate(dV = c(NA, diff(`Trading Volume`)) / diff(`Trading Days since ICO`))
+
+# Calculation of the first derivative of Market Cap
+Ethereum_refined <- Ethereum_refined %>% 
+  mutate(dMC = c(NA, diff(`Market Cap`)) / diff(`Trading Days since ICO`))
+
+# Ethereum Derivative Graphs
+p3 <- ggplot(Ethereum_refined, aes(`Trading Days since ICO`, dV)) +
+  geom_path() +
+  ggtitle("Derivative of Ethereum Trading Volume by Day") +
+  ylab("")
+  labs(caption = "Figure 7: Movement of First Derivative of Ethereum Trading Volume since ICO")
+
+p4 <- ggplot(Ethereum_refined, aes(`Trading Days since ICO`, dMC)) +
+  geom_path() +
+  ggtitle("Derivative of Ethereum Market Cap by Day") +
+  ylab("")
+  labs(caption = "Figure 8: Movement of First Derivative of Ethereum Market Capitalization since ICO")
+
+# Arrange the two plots in a grid
+grid.arrange(p3, p4, ncol = 2)
+
+```
+
+
+# Dogecoin Data Refinement
+The following code checks if a refined version of the Dogecoin data exists in a CSV file. If it doesn't exist, the original Dogecoin data is read in and then refined by removing unnecessary columns, creating a new column called "Trading Days since ICO", dropping any rows with missing data, and renaming columns. The refined data is then written to a new CSV file called "Dogecoin_refined.csv". If the refined data already exists in the CSV file, it is simply read in from the file.
+```{r}
+
+if (!file.exists("archive/Dogecoin_refined.csv")) {
+  # read in original data
+  Dogecoin <- read.csv("archive/Dogecoin.csv")
+  
+  # refine data
+  Dogecoin_refined <- Dogecoin %>% 
+    select(-Open, -High, -Low, -Close) %>% 
+    mutate(`Trading Days since ICO` = row_number()) %>% 
+    drop_na() %>% 
+    rename(Date = 1, 
+           `Trading Volume` = 2, 
+           `Market Cap` = 3, 
+           `Trading Days since ICO` = 4)
+  
+  # write refined data to CSV
+  write_csv(Dogecoin_refined, "archive/Dogecoin_refined.csv")
+  
+} else {
+  # read in refined data from CSV
+  Dogecoin_refined <- read_csv("archive/Dogecoin_refined.csv", show_col_types = FALSE)
+}
+
+```
+
+Below is a sample of the first 10 rows of the Dogecoin_refined.csv dataset that was to be used in the analysis:
+
+```{r}
+
+kable(head(Dogecoin_refined, 10))
+
+```
+
+# Dogecoin Graphs
+The following code creates two graphs using the refined Dogecoin data: one displaying the Dogecoin trading volume by day and the other displaying the Dogecoin market cap by day. The grid.arrange() function arranges the two graphs side by side.
+```{r}
+
+#Dogecoin Graphs:
+p1 <- ggplot(Dogecoin_refined, aes(`Trading Days since ICO`, `Trading Volume`)) + 
+  geom_path() + ggtitle("Dogecoin Trading Volume by Day") +
+  labs(caption = "Figure 9: Movement of Dogecoin Trading Volume since ICO")
+
+p2 <- ggplot(Dogecoin_refined, aes(`Trading Days since ICO`, `Market Cap`)) + 
+  geom_path() + ggtitle("Dogecoin Market Cap by Day") +
+  labs(caption = "Figure 10: Movement of Dogecoin Market Capitalization since ICO")
+
+grid.arrange(p1, p2, ncol = 2)
+
+```
+
+Above we see Figures 1 and 2, depicting the movement of trade volume and market capitalization of Dogecoin since ICO. Though we see similar patterns in the trends, we don't necessarily see the two exactly matching one another. To further investigate the movement of these numbers, I chose to see what the derivative graphs for the Dogecoin's Trading Volume and Market Capitalization would look like.
+```{r}
+
+# Calculation of the first derivative of Trading Volume
+Dogecoin_refined <- Dogecoin_refined %>% 
+  mutate(dV = c(NA, diff(`Trading Volume`)) / diff(`Trading Days since ICO`))
+
+# Calculation of the first derivative of Market Cap
+Dogecoin_refined <- Dogecoin_refined %>% 
+  mutate(dMC = c(NA, diff(`Market Cap`)) / diff(`Trading Days since ICO`))
+
+# Ethereum Derivative Graphs
+p3 <- ggplot(Dogecoin_refined, aes(`Trading Days since ICO`, dV)) +
+  geom_path() +
+  ggtitle("Derivative of Dogecoin Trading Volume by Day") +
+  ylab("")
+  labs(caption = "Figure 11: Movement of First Derivative of Dogecoin Trading Volume since ICO")
+
+p4 <- ggplot(Dogecoin_refined, aes(`Trading Days since ICO`, dMC)) +
+  geom_path() +
+  ggtitle("Derivative of Dogecoin Market Cap by Day") +
+  ylab("")
+  labs(caption = "Figure 12: Movement of First Derivative of Dogecoin Market Capitalization since ICO")
+
+# Arrange the two plots in a grid
+grid.arrange(p3, p4, ncol = 2)
+
+```
+
+# Shiba INU Data Refinement
+The following code checks if a refined version of the Shiba INU data exists in a CSV file. If it doesn't exist, the original Shiba INU data is read in and then refined by removing unnecessary columns, creating a new column called "Trading Days since ICO", dropping any rows with missing data, and renaming columns. The refined data is then written to a new CSV file called "Shiba INU_refined.csv". If the refined data already exists in the CSV file, it is simply read in from the file.
+```{r}
+
+if (!file.exists("archive/Shiba INU_refined.csv")) {
+  # read in original data
+  `Shiba INU` <- read.csv("archive/Shiba INU.csv")
+  
+  # refine data
+  `Shiba INU_refined` <- `Shiba INU` %>% 
+    select(-Open, -High, -Low, -Close) %>% 
+    mutate(`Trading Days since ICO` = row_number()) %>% 
+    drop_na() %>% 
+    rename(Date = 1, 
+           `Trading Volume` = 2, 
+           `Market Cap` = 3, 
+           `Trading Days since ICO` = 4)
+  
+  # write refined data to CSV
+  write_csv(`Shiba INU_refined`, "archive/Shiba INU_refined.csv")
+  
+} else {
+  # read in refined data from CSV
+  `Shiba INU_refined` <- read_csv("archive/Shiba INU_refined.csv",show_col_types = FALSE)
+}
+
+```
+
+Below is a sample of the first 10 rows of the Shiba INU_refined.csv dataset that was to be used in the analysis:
+
+```{r}
+
+kable(head(`Shiba INU_refined`, 10))
+
+```
+
+# Shiba INU Graphs
+The following code creates two graphs using the refined Shiba INU data: one displaying the Shiba INU trading volume by day and the other displaying the Shiba INU market cap by day. The grid.arrange() function arranges the two graphs side by side.
+```{r}
+
+#Shiba INU Graphs:
+p1 <- ggplot(`Shiba INU_refined`, aes(`Trading Days since ICO`, `Trading Volume`)) + 
+  geom_path() + ggtitle("Shiba INU Trading Volume by Day") + 
+  labs(caption = "Figure 13: Movement of Shiba INU Trading Volume since ICO")
+
+p2 <- ggplot(`Shiba INU_refined`, aes(`Trading Days since ICO`, `Market Cap`)) + 
+  geom_path() + ggtitle("Shiba INU Market Cap by Day") +
+  labs(caption = "Figure 14: Movement of Shiba INU Market Capitalization since ICO")
+
+grid.arrange(p1, p2, ncol = 2)
+
+```
+
+Above we see Figures 1 and 2, depicting the movement of trade volume and market capitalization of Ethereum since ICO. Though we see similar patterns in the trends, we don't necessarily see the two exactly matching one another. To further investigate the movement of these numbers, I chose to see what the derivative graphs for the Ethereum's Trading Volume and Market Capitalization would look like.
+```{r}
+
+# Calculation of the first derivative of Trading Volume
+`Shiba INU_refined` <- `Shiba INU_refined` %>% 
+  mutate(dV = c(NA, diff(`Trading Volume`)) / diff(`Trading Days since ICO`))
+
+# Calculation of the first derivative of Market Cap
+`Shiba INU_refined` <- `Shiba INU_refined` %>% 
+  mutate(dMC = c(NA, diff(`Market Cap`)) / diff(`Trading Days since ICO`))
+
+# Ethereum Derivative Graphs
+p3 <- ggplot(`Shiba INU_refined`, aes(`Trading Days since ICO`, dV)) +
+  geom_path() +
+  ggtitle("Derivative of Shiba INU Trading Volume by Day") +
+  ylab("")
+  labs(caption = "Figure 15: Movement of First Derivative of Shiba INU Trading Volume since ICO")
+
+p4 <- ggplot(`Shiba INU_refined`, aes(`Trading Days since ICO`, dMC)) +
+  geom_path() +
+  ggtitle("Derivative of Ethereum Market Cap by Day") +
+  ylab("")
+  labs(caption = "Figure 16: Movement of First Derivative of Shiba INU Market Capitalization since ICO")
+
+# Arrange the two plots in a grid
+grid.arrange(p3, p4, ncol = 2)
+
+```
